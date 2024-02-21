@@ -1,0 +1,3 @@
+- [ ] multi-thread support 
+- [ ] using snarkjs c tester to replace the js tester 
+- [ ] using the c ciminion lib 

@@ -1,0 +1,19 @@
+- cipher.js 
+    - encryption a 64-number chunk using ciminion key set 
+    - decryption
+    - calculate the recursive hash of 64-number data chunk. 
+    - calculate the recursive hash of multiple 64-N chunks. 
+    - TBD: encryption a list of chunks with tweaked nonce
+    - TBD: decryption a list of chunks with tweaked nonce
+- ciminion_key.js 
+    - generate a new rand key set
+    - generate new key set and export in json 
+    - load key from json 
+- chunk.js: convert a file into ZK-able numbers. 
+    - divide a file into serveral chunks 
+    - rebuild the file from chunks
+- merkle.js: 
+    - TBD: calculate the merkle root
+    - TBD: verify merkle root 
+    - TBD: generate merkle path 
+    - TBD: verify merkle path 

@@ -12,3 +12,4 @@ circuits/*_js/
 data/src/
 tmp/
 circuits/circomlib/
+*.json 

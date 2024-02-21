@@ -6,6 +6,7 @@ const web3 = require("web3");
 // output: the merkle root in Fr, in string.
 // each leaf i = keccak256(input[i], i). input[i] should be converted to uint256 before hashing.
 // the keccak256 from the web3 library is used here.
+// TBD: new merkle root sop 
 function MerkleRoot(COMs) {
     // caculate the leaves leaf_i = keccak256(input[i], i)
     let leaves = [];

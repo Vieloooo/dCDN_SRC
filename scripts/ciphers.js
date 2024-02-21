@@ -39,6 +39,35 @@ async function PTCtoCTC(ptc, sk, if_recompile = true) {
     return ctc_array;
 }
 
+/// encrypt a plaintext array (64 number in an array) into a ciphertext array in string with tweak nonce (index is string too)
+// ptc should be an array of numbers in BN254
+// sk should be an object with 4 keys: MK_0, MK_1, IV, nonce
+async function PTCtoCTC(ptc, sk, index, if_recompile = true) {
+    // load the encrypted circuit
+    const chunk_encoder = await wasm_tester("../circuits/enc64.circom", {
+        output: "../tmp",
+        recompile: if_recompile,
+    });
+    const input = {
+        PT: ptc,
+        MK_0: sk.MK_0,
+        MK_1: sk.MK_1,
+        IV: sk.IV,
+        nonce: sk.nonce,
+    };
+    const wtns = await chunk_encoder.calculateWitness(input);
+    await chunk_encoder.checkConstraints(wtns);
+    // get the ciphertext from the wtns
+    const ctc = await chunk_encoder.getOutput(wtns, ["CT[64]"]);
+    // the ctc is an map from CT[i] to string, convert to array of strings with the order of CT[0], CT[1], ..., CT[63]
+    const ctc_array = [];
+    for (let i = 0; i < 64; i++) {
+        ctc_array.push(ctc["CT[" + i + "]"]);
+    }
+    // convert the array of strings to array of numbers using ffjavascript in the filed Fr
+    return ctc_array;
+}
+
 /// decrypt a ciphertext array into a plaintext array in string
 // ctc should be an array of numbers in BN254
 // sk should be an object with 4 keys: MK_0, MK_1, IV, nonce, all in string format
@@ -83,7 +112,7 @@ async function HashCTC(ctc, if_recompile = true) {
     return hash;
 }
 
-/// encrypts multi PTC into multi CTC, utilizing no recompile and multithreadk to save time
+/// encrypts multi PTCs into multi CTCs, utilizing no recompile and multithread to save time
 async function PTCstoCTCs(ptcs, sk) {
     // check ptcs length 
     if (ptcs.length == 0) {
@@ -111,6 +140,7 @@ async function CTCstoPTCs(ctcs, sk) {
     // get the number of ctcs
     const n = ctcs.length;
     let ptcs = [];
+    // todo: tweak k
     // for the first ctc, recompile the circuit, and wait for the compilation to finish
     ptcs.push(await CTCtoPTC(ctcs[0], sk, true));
     // for the rest ctcs, no recompile, and run in parallel, watch out the order of the ptcs array

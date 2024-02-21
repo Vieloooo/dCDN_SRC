@@ -1,5 +1,0 @@
-- outlines 
-    - goals 
-    - security model
-    - proof 
-    - evaluation based on random

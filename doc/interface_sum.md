@@ -1,0 +1,50 @@
+- cipher.js 
+    - encrypt a 64-number chunk using ciminion key set
+    - decrypt a 64-number chunk using ciminion key set 
+    - TBD: encrypt a 64-number chunk using ciminion key set with tweaked nonce
+    - TBD: decrypt a 64-number chunk using ciminion key set with tweaked nonce    
+    - hash  
+        - poseidon one chunk (64)
+        - TBD: poseidon 2
+        - TBD: poseidon 3
+        - TBD: sha256 two numbers circom 
+- merkle.js
+    - TBD: sha256 merkle tree with index 
+    - TBD: merkle root 
+- ciminion_key.js 
+    - generate a new rand key set
+    - generate new key set and export in json 
+- TBD: vxor.js 
+    - TBD: generate the VXOR 
+        - `gen_VXOR(key, secret) -> ((c1, c2, c3), proof, h1, h2 )`
+        - `c1 = MK0 xor poseidon(secret)`
+        - `c2 = MK1 xor poseidon(secret || 1)`
+        - `c3 = MK2 xor poseidon(secret || 2)`
+        - proof claim that: 
+            - c1, c2, c3 are correct 
+            - `h1 = poseidon(MK0, MK1, MK2)`
+            - `h2 = sha256(secret)`
+    - TBD: verify VXOR 
+    - TBD: reverse VXOR: get keys from c1, c2, c3 and secret. 
+- TBD: signature.js 
+    - generate a evm key pair 
+    - sign some message 
+- TBD: commitment.js 
+    - generate one encryption commitment: 
+        - `enc_com(chunk_in, chunk_out, MK0, MK1, IV, nonce, index, pubkey) -> (h_in, h_out, h_key, index, signature)`
+            - `h_in = poseidon_chunk(chunk_in)`
+            - `h_out = poseidon_chunk(chunk_out)`
+            - `h_key = poseidon_3(MK0, MK1, nonce)`
+            - sign `(h_in, h_out, h_key, index)` using `pubkey`
+    - verify the commitment signature 
+    - verify the commitment chain 
+        `com_chain_ver(chunk_out, [com1, com2, ..., com_n])`
+            - verify the signature of each chain. 
+            - `com_i.h_out == com_(i+1).h_in`
+
+- smart contract 
+    - join 
+    - leave 
+    - withdraw 
+    - pof 
+
