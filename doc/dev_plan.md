@@ -10,4 +10,19 @@
 - [ ] goto the next step: POC Demo 
 
 POC DEMO 
-We assume only three 
+We assume only three node, P, R, C. 
+1. P , R runs a setup phase and "send" VXOR to C. 
+2. C verify VXOR. 
+3. P generate the leaf hash, then R and C verify this. 
+4. For a file m, P divide this file into chunks, encrypt them and generate commitments. 
+5. R verify the chunks and commitment chains. 
+6. R encrypt the chunks and generate commitments. 
+7. C verify the chunks and commitment chains.
+8. C decrypt the chunks with one by one verification. 
+
+DEMO branch two: Proof of fraud
+1. we intently build a fraud encryption commitment. 
+    - correct (m - h -> c)
+    - incorrect (m' - h -> c) m' = m 
+2. submit the incorrect commitment onchain. 
+3. test our solidity contract. 
