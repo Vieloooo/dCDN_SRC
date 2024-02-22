@@ -56,8 +56,37 @@ async function sha256_zk(preimage = "4", if_recompile = true) {
     hash = BigInt("0b" + hash).toString(16);
     return hash; 
 }
+// the input preimage is strictly limit to a BN-254 
+async function sha256_zk_BN(preimage = "4", if_recompile = true) {
+    // load the sha256 circuit
+    const sha256_cir = await wasm_tester("../circuits/hash_sha256_BN.circom", {
+        output: "../tmp",
+        recompile: if_recompile,
+    });
+    
+    const input = {
+        in: preimage, 
+    };
+    const wtns = await sha256_cir.calculateWitness(input);
+    await sha256_cir.checkConstraints(wtns);
+    // get the binary from the wtns
+    const result = await sha256_cir.getOutput(wtns, ["out[256]"]);
+    // extract the 256 bits hash from the result 
+    // init a array of 256 bytes
+    const hash_array = [];
+    for (let i = 0; i < 256; i++) {
+        hash_array.push(result["out[" + i + "]"]);
+    }
+    let hash = hash_array.join("");
+    // convert binary string to hex string 
+    hash = BigInt("0b" + hash).toString(16);
+    return hash; 
+}
+
+
 
 module.exports = {
     sha256_zk, 
+    sha256_zk_BN,
     decimalToBinaryN, 
 };
