@@ -42,9 +42,9 @@ async function PTCtoCTC(ptc, sk, if_recompile = true) {
 /// encrypt a plaintext array (64 number in an array) into a ciphertext array in string with tweak nonce (index is string too)
 // ptc should be an array of numbers in BN254
 // sk should be an object with 4 keys: MK_0, MK_1, IV, nonce
-async function PTCtoCTC(ptc, sk, index, if_recompile = true) {
+async function PTCtoCTC_tweak(ptc, sk, index, if_recompile = true) {
     // load the encrypted circuit
-    const chunk_encoder = await wasm_tester("../circuits/enc64.circom", {
+    const chunk_encoder = await wasm_tester("../circuits/enc_tweak64.circom", {
         output: "../tmp",
         recompile: if_recompile,
     });
@@ -54,6 +54,7 @@ async function PTCtoCTC(ptc, sk, index, if_recompile = true) {
         MK_1: sk.MK_1,
         IV: sk.IV,
         nonce: sk.nonce,
+        index: index,
     };
     const wtns = await chunk_encoder.calculateWitness(input);
     await chunk_encoder.checkConstraints(wtns);
@@ -92,7 +93,34 @@ async function CTCtoPTC(ctc, sk, if_recompile = true) {
     for (let i = 0; i < 64; i++) {
         ptc_array.push(ptc["PT[" + i + "]"]);
     }
-    console.log("finish a enc");
+    return ptc_array;
+}
+
+/// decrypt a ciphertext array into a plaintext array in string
+// ctc should be an array of numbers in BN254
+// sk should be an object with 4 keys: MK_0, MK_1, IV, nonce, all in string format
+async function CTCtoPTC_tweak(ctc, sk,index, if_recompile = true) {
+    // load the decrypted circuit
+    const chunk_decoder = await wasm_tester("../circuits/dec_tweak64.circom", {
+        output: "../tmp",
+        recompile: if_recompile,
+    });
+    const wtns = await chunk_decoder.calculateWitness({
+        CT: ctc,
+        MK_0: sk.MK_0,
+        MK_1: sk.MK_1,
+        IV: sk.IV,
+        nonce: sk.nonce,
+        index: index,
+    });
+    await chunk_decoder.checkConstraints(wtns);
+    // get the plaintext from the wtns
+    const ptc = await chunk_decoder.getOutput(wtns, ["PT[64]"]);
+    // the ptc is an map from PT[i] to string, convert to array of strings with the order of PT[0], PT[1], ..., PT[63]
+    const ptc_array = [];
+    for (let i = 0; i < 64; i++) {
+        ptc_array.push(ptc["PT[" + i + "]"]);
+    }
     return ptc_array;
 }
 
@@ -113,7 +141,7 @@ async function HashCTC(ctc, if_recompile = true) {
 }
 
 /// encrypts multi PTCs into multi CTCs, utilizing no recompile and multithread to save time
-async function PTCstoCTCs(ptcs, sk) {
+async function PTCstoCTCs_tweak(ptcs, sk) {
     // check ptcs length 
     if (ptcs.length == 0) {
         return [];
@@ -122,31 +150,33 @@ async function PTCstoCTCs(ptcs, sk) {
     const n = ptcs.length;
     let ctcs = [];
     // for the first ptc, recompile the circuit, and wait for the compilation to finish
-    ctcs.push(await PTCtoCTC(ptcs[0], sk, true));
+    ctcs.push(await PTCtoCTC_tweak(ptcs[0], sk, "0",  true));
     // for the rest ptcs, no recompile, and run in parallel, watch out the order of the ctcs array
     for (let i = 1; i < n; i++) {
         // does the order of result match the order of input?
         console.log("start enc chunk: ", i);
-        ctcs.push(PTCtoCTC(ptcs[i], sk, false));
+        // convert the index to string
+        let index = i.toString();
+        ctcs.push(PTCtoCTC_tweak(ptcs[i], sk, index, false));
     }
     // wait for all the ctcs to finish
     ctcs = await Promise.all(ctcs);
-    console.log("finish enc");
+    console.log("finish enc a chunk list");
     return ctcs;
 }
 
 /// decrypts multi CTC into multi PTC, utilizing no recompile and multithreadk to save time
-async function CTCstoPTCs(ctcs, sk) {
+async function CTCstoPTCs_tweak(ctcs, sk) {
     // get the number of ctcs
     const n = ctcs.length;
     let ptcs = [];
     // todo: tweak k
     // for the first ctc, recompile the circuit, and wait for the compilation to finish
-    ptcs.push(await CTCtoPTC(ctcs[0], sk, true));
+    ptcs.push(await CTCtoPTC_tweak(ctcs[0], sk, "0", true));
     // for the rest ctcs, no recompile, and run in parallel, watch out the order of the ptcs array
     for (let i = 1; i < n; i++) {
         // does the order of result match the order of input?
-        ptcs.push(CTCtoPTC(ctcs[i], sk, false));
+        ptcs.push(CTCtoPTC_tweak(ctcs[i], sk, i.toString(), false));
     }
     // wait for all the ptcs to finish
     ptcs = await Promise.all(ptcs);
@@ -173,8 +203,10 @@ module.exports = {
     PTCtoCTC,
     CTCtoPTC,
     HashCTC,
-    PTCstoCTCs,
-    CTCstoPTCs,
+    PTCstoCTCs_tweak,
+    CTCstoPTCs_tweak,
     HashCTCs,
+    PTCtoCTC_tweak,
+    CTCtoPTC_tweak,
 };
 

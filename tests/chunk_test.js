@@ -47,6 +47,7 @@ describe('chunk functions', () => {
     });
     /// remove all chunks 
     after(() => {
+        return; 
         const inputFilePath = testFilePath;
         const chunkFolder = chunkLib.getChunkFolder(inputFilePath);
         const files = fs.readdirSync(chunkFolder);
