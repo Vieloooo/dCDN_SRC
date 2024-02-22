@@ -4,7 +4,6 @@ const wasm_tester = require("../circom_tester/index").wasm;
 // input number should be a string like "123"
 
 const N = 8; 
-
 function decimalToBinaryN(decimalString) {
     // Convert the decimal string to a BigInt, then to a binary string
     let binaryString = BigInt(decimalString).toString(2);
@@ -20,6 +19,11 @@ function decimalToBinaryN(decimalString) {
   
     return binaryString;
 }
+
+// convert a bigint (max 256 bits long) in decimal to 8 bytes, with left padding 
+// input: a bigint in decimal
+// output: 8 bytes array 
+
 
 async function sha256_zk(preimage = "4", if_recompile = true) {
     // load the sha256 circuit
@@ -55,5 +59,5 @@ async function sha256_zk(preimage = "4", if_recompile = true) {
 
 module.exports = {
     sha256_zk, 
-    decimalToBinaryN
+    decimalToBinaryN, 
 };
