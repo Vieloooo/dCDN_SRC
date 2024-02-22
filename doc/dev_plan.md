@@ -1,4 +1,4 @@
-- [ ] implement tweaked chunk enc/dec 
+- [x] implement tweaked chunk enc/dec 
 - [ ] sha256 circom two number and corresponding test (verify using normal sha256 code)
 - [ ] update merkle root code 
 - [ ] vxor 
