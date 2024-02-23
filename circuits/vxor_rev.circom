@@ -32,47 +32,35 @@ template OP_XOR(){
     c <== b2n.out;
 
 }
-template VXOR(){
-    signal input MK_0; 
-    signal input MK_1; 
-    signal input nonce; 
+template VXOR_Rev(){
+    signal input c1; 
+    signal input c2;
+    signal input c3;
     signal input secret; 
-    signal output c1; 
-    signal output c2;
-    signal output c3;
-    signal output h_k; 
-    signal output h_s[256]; 
+    signal output MK_0; 
+    signal output MK_1; 
+    signal output nonce; 
     component H1 = Poseidon(2); 
     component H2 = Poseidon(2); 
-    component H3 = Poseidon(3); 
     H1.inputs[0] <== secret;
     H1.inputs[1] <== 1;
     H2.inputs[0] <== secret;
     H2.inputs[1] <== 2;
-    H3.inputs[0] <== MK_0;
-    H3.inputs[1] <== MK_1;
-    H3.inputs[2] <== nonce;
 
     signal mask1 <== H1.out; 
     signal mask2 <== H2.out;
-    h_k <== H3.out; 
     component xor1 = OP_XOR(); 
-    xor1.a <== MK_0;
+    xor1.a <== c1;
     xor1.b <== secret;
-    c1 <== xor1.c;
+    MK_0 <== xor1.c;
     component xor2 = OP_XOR();
-    xor2.a <== MK_1;
+    xor2.a <== c2;
     xor2.b <== mask1;
-    c2 <== xor2.c;
+    MK_1 <== xor2.c;
     component xor3 = OP_XOR();
-    xor3.a <== nonce;
+    xor3.a <== c3;
     xor3.b <== mask2;
-    c3 <== xor3.c;
-
-    // hash the secret 
-    component sha256BN = sha256_BN();
-    sha256BN.in <== secret;
-    h_s <== sha256BN.out;
+    nonce <== xor3.c;
 } 
 
-component main = VXOR(); 
+component main = VXOR_Rev();
