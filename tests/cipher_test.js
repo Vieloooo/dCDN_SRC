@@ -61,6 +61,7 @@ describe("cipher functions", function () {
         const sk0 = await ciminionKeyLib.LoadCIminionKeyJson(skPath_0);
         // we randomly set the index = 6 
         const ctc = await cipherLib.PTCtoCTC_tweak(ptc, sk0, "6");
+        //console.log(ctc[0], typeof(ctc[0]));
         fs.writeFileSync(ctcPath_tweaked, JSON.stringify(ctc));
         // decrypt ctc
         const ptc_decrypted = await cipherLib.CTCtoPTC_tweak(ctc, sk0, "6");

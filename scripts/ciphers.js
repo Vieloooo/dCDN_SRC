@@ -199,6 +199,26 @@ async function HashCTCs(ctcs) {
     hashes = await Promise.all(hashes);
     return hashes; 
 }
+
+/// hash the key using poseidon h = poseidon (MK_0, MK_1, nonce)
+async function HashKey(sk, if_recompile = true) {
+    // load the hash circuit
+    const key_hash = await wasm_tester("../circuits/hash_key.circom", {
+        output: "../tmp",
+        recompile: if_recompile,
+    });
+    const input = {
+        MK_0: sk.MK_0,
+        MK_1: sk.MK_1,
+        nonce: sk.nonce, 
+    }
+    const wtns = await key_hash.calculateWitness(input);
+    await key_hash.checkConstraints(wtns);
+    // get the hash from the wtns
+    const output = await key_hash.getOutput(wtns, ["h_sk"]);
+    // convert the hash from string to number using ffjavascript in the filed Fr
+    return output['h_sk']; 
+}
 module.exports = {
     PTCtoCTC,
     CTCtoPTC,
@@ -208,5 +228,6 @@ module.exports = {
     HashCTCs,
     PTCtoCTC_tweak,
     CTCtoPTC_tweak,
+    HashKey,
 };
 
