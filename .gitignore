@@ -13,3 +13,5 @@ data/src/
 tmp/
 circuits/circomlib/
 data/ 
+tests/*.json 
+keys/

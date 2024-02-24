@@ -28,6 +28,22 @@ describe("cipher functions", function () {
         
     }); 
 
+    it("should generate vxor proof and verity this", async () => {
+        const vxorZKLib = require("../scripts/vxor.js");
+        let sk = {
+            MK_0: "1023",
+            MK_1: "1033",
+            nonce: "1033"
+        };
+        let secret = "11111324234";
+        vxorZKLib.VXOR_Gen(sk, secret, true).then(() => {
+            process.exit(0);
+        });
+        const res = await vxorZKLib.VXOR_Ver();
+        chai.assert.equal(res, true, "the proof should be verified");
+        
+    }); 
+
     /// after test, remove the ciminion key and all the PTCs, CTCs 
     after(() => {
         // temp test, do not remove the ciminion key

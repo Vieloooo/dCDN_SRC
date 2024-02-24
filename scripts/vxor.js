@@ -6,6 +6,8 @@ exports.p = Scalar.fromString(
 
 const Fr = new F1Field(exports.p);
 const wasm_tester = require("../circom_tester/index").wasm;
+const snarkjs = require("snarkjs");
+
 
 /// Generate vxor result and corresponding hashes without generate the proof, only generate c1, c2, c3 and h_k, h_s 
 // secret is a BN number 
@@ -67,10 +69,41 @@ async function VXOR_Rev(c1, c2, c3, secret, if_recompile){
     return [outputs["MK_0"], outputs["MK_1"], outputs["nonce"]];
 }
 
-async function VXOR_Gen(){
-
+/// Generate VXOR and corresbonding proofs 
+// add then(()=> process.exit(0)) for this async function 
+async function VXOR_Gen(sk, secret , if_recompile = true, proof_path="./proof.json", pubSig_path = "./public.json"){
+    // load the vxor circuit
+    const vxor_cir = await wasm_tester("../circuits/vxor.circom", {
+        output: "../tmp",
+        recompile: if_recompile,
+    });
+    const cir_wasm_path = "../tmp/vxor_js/vxor.wasm";
+    const final_zkey_path = "../keys/16_vxor_1.zkey";
+    // build the input for the circuit 
+    const input = {
+        MK_0: sk.MK_0,
+        MK_1: sk.MK_1,
+        nonce: sk.nonce,
+        secret: secret
+    };
+    // generate proofs 
+    const { proof, publicSignals } = await snarkjs.groth16.fullProve(input, cir_wasm_path, final_zkey_path);
+    // export the proof to json 
+    const proof_json = JSON.stringify(proof, null, 1);
+    const pubSig_json = JSON.stringify(publicSignals, null, 1);
+    const fs = require('fs');
+    fs.writeFileSync(proof_path, proof_json);
+    fs.writeFileSync(pubSig_path, pubSig_json);
+    return true; 
 }
-async function VXOR_Ver(){
+// bool function to verify the proof
+async function VXOR_Ver(verify_key_path= "../keys/vxor_ver.json", proof_path = "./proof.json", pubSig_path="public.json"){
+    const fs = require('fs');
+    const vKey = JSON.parse(fs.readFileSync(verify_key_path));
+    const proof = JSON.parse(fs.readFileSync(proof_path));
+    const pubSig = JSON.parse(fs.readFileSync(pubSig_path));
+    const res = await snarkjs.groth16.verify(vKey, pubSig, proof);
+    return res; 
 
 }
 
