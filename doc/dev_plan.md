@@ -2,11 +2,11 @@
 - [x] sha256 circom two number and corresponding test (verify using normal sha256 code)
 - [ ] test 256 input sha256 circom consistency with crypto lib : **how to encode a 254 bits big int into 256 bits**. 
 - [x] update merkle root code 
-- [ ] vxor 
+- [x] vxor 
     - [x] generation 
     - [x]export c1, c2, c3 and proof 
-    - [ ] verify 
-- [ ] commitment js 
+    - [x] verify 
+- [x] commitment js 
 - [ ] smart contract 
 - [ ] goto the next step: POC Demo 
 
