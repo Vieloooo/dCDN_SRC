@@ -14,7 +14,10 @@ async function SETUP_prep(sk_path, secret_path){
     fs.writeFileSync(sk_path, sk_json);
 
     // generate a 254 bits hash 
-    const secret = ciminionLib.randomScalar(Fr).toString(); 
+    const secret = ciminionLib.randomScalar(Fr);
+    if (secret >= Fr.p){
+        console.log("error in secret generation");
+    } 
     console.log("secret key: ", sk);
     console.log("secret hash: ", secret);
     // save secret to json 
@@ -29,7 +32,8 @@ async function SETUP_Gen_VXOR(sk_path, secret_path, proof_path, pubSig_path ){
     // load the sk and secret from json 
     const sk = JSON.parse(fs.readFileSync(sk_path)); 
     const secret = JSON.parse(fs.readFileSync(secret_path)); 
-    return await VXOR_Lib.VXOR_Gen(sk, secret, true, proof_path, pubSig_path)
+    console.log(secret, typeof(secret));
+    return await VXOR_Lib.VXOR_Gen(sk, secret, false, proof_path, pubSig_path)
 }
 
 /// Verify the setup vxor 

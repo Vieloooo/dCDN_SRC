@@ -15,3 +15,7 @@ circuits/circomlib/
 data/ 
 tests/*.json 
 keys/
+# demo 
+demo/*/*.json 
+demo/*/*.txt 
+demo/*.json 

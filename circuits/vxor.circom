@@ -16,18 +16,18 @@ template OP_XOR(){
     signal input b; 
     signal output c; 
 
-    component n2b_1 = Num2Bits_strict(); 
-    component n2b_2 = Num2Bits_strict();
+    component n2b_1 = Num2Bits(256); 
+    component n2b_2 = Num2Bits(256);
     n2b_1.in <== a; 
     n2b_2.in <== b;
-    signal {binary} a_bits[254] <== n2b_1.out;
-    signal {binary} b_bits[254]  <== n2b_2.out;
+    signal {binary} a_bits[256] <== n2b_1.out;
+    signal {binary} b_bits[256]  <== n2b_2.out;
 
     signal {binary} c_bits[254];
     for (var i = 0; i < 254; i ++ ){
         c_bits[i] <== a_bits[i] +  b_bits[i] - 2 * a_bits[i] * b_bits[i];
     }
-    component b2n = Bits2Num_strict();
+    component b2n = Bits2Num(254);
     b2n.in <== c_bits;
     c <== b2n.out;
 

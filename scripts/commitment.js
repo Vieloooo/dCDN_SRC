@@ -10,6 +10,7 @@ function generatePrivateKey(pk_path) {
     fs.writeFileSync(pk_path, wallet.privateKey);
     
     //return wallet.privateKey;
+    return wallet.address;
 }
 /// sign a message in string format
 async function signMessage(message, sk_path="eth_sk.txt") {

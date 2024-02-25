@@ -36,9 +36,7 @@ describe("cipher functions", function () {
             nonce: "1033"
         };
         let secret = "11111324234";
-        vxorZKLib.VXOR_Gen(sk, secret, true).then(() => {
-            process.exit(0);
-        });
+        await vxorZKLib.VXOR_Gen(sk, secret, true)
         const res = await vxorZKLib.VXOR_Ver();
         chai.assert.equal(res, true, "the proof should be verified");
         
