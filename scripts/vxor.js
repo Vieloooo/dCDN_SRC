@@ -97,7 +97,7 @@ async function VXOR_Gen(sk, secret , if_recompile = true, proof_path="./proof.js
     return true; 
 }
 // bool function to verify the proof
-async function VXOR_Ver(verify_key_path= "../keys/vxor_ver.json", proof_path = "./proof.json", pubSig_path="public.json"){
+async function VXOR_Ver(verify_key_path= "../keys/vxor_ver.json", proof_path = "./proof.json", pubSig_path = "public.json"){
     const fs = require('fs');
     const vKey = JSON.parse(fs.readFileSync(verify_key_path));
     const proof = JSON.parse(fs.readFileSync(proof_path));

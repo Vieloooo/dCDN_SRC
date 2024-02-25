@@ -27,7 +27,7 @@ template OP_XOR(){
     for (var i = 0; i < 254; i ++ ){
         c_bits[i] <== a_bits[i] +  b_bits[i] - 2 * a_bits[i] * b_bits[i];
     }
-    component b2n = Bits2Num_strict();
+    component b2n = Bits2Num(254);
     b2n.in <== c_bits;
     c <== b2n.out;
 

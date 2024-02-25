@@ -12,9 +12,9 @@ function randomScalar(field) {
     // Convert the buffer to a BigInt
     rand = BigInt('0x' + buf.toString('hex'));
     // Ensure the random number fits within the field (less than p)
-    rand = Scalar.mod(rand, field.p);
-  } while (rand >= field.p);
-
+    rand = Scalar.mod(rand, field.p); 
+  } while (rand >= field.p );
+  rand = rand >> BigInt(2); 
   return rand;
 }
 function GenCiminionKey(){

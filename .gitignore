@@ -19,3 +19,4 @@ keys/
 demo/*/*.json 
 demo/*/*.txt 
 demo/*.json 
+demo/example_output
