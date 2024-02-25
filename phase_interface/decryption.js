@@ -21,6 +21,8 @@ async function DECRYPTION_dec_chunk(ctc, com_chain, index,  sk_list){
     // decrypt the chunk layer by layer
     let ptc = ctc;
     for (let i = com_chain.length -1; i >=0; i--){
+        console.log("dec on layer: ", i);
+        console.log(ptc, sk_list[i], com_chain[i], index);
         const res = await DECRYPTION_dec_chunk_layer(ptc, sk_list[i], com_chain[i], index);
         if (!res.res){
             return {cheater_idx: i, ptc: res.ptc}; 

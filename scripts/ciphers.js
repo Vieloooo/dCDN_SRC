@@ -135,9 +135,9 @@ async function HashCTC(ctc, if_recompile = true) {
     const wtns = await chunk_hash.calculateWitness({ in: ctc });
     await chunk_hash.checkConstraints(wtns);
     // get the hash from the wtns
-    const hash = chunk_hash.getOutput(wtns, ["out"]);
+    const hash =await  chunk_hash.getOutput(wtns, ["out"]);
     // convert the hash from string to number using ffjavascript in the filed Fr
-    return hash;
+    return hash["out"];
 }
 
 /// encrypts multi PTCs into multi CTCs, utilizing no recompile and multithread to save time
