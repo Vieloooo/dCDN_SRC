@@ -4,6 +4,7 @@ const ethers = require('ethers');
 function generatePrivateKey(pk_path) {
     const wallet = ethers.Wallet.createRandom();
     console.log("Private Key:", wallet.privateKey);
+    console.log("Address:", wallet.address);
     // write the private key to a file 
     const fs = require('fs');
     fs.writeFileSync(pk_path, wallet.privateKey);
@@ -61,7 +62,8 @@ async function COM_Gen(sk_path="./eth_sk.txt", h_pre, h_nxt, h_k, index){
     return signature; 
 }
 
-async function COM_Ver(message, signature, expectedSignerAddress) {
+async function COM_Ver( h_pre, h_nxt, h_k, index, signature, expectedSignerAddress) {
+    const message = "{" + h_pre + ", " + h_nxt + ", " + h_k + ", " + index + "}";
     // 假设 message 是一个字符串，signature 是由签名者生成的签名
     // 计算消息的以太坊特定签名哈希 (EIP-191)
     const messageHash = ethers.utils.id(message);

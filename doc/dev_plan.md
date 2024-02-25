@@ -7,8 +7,8 @@
     - [x]export c1, c2, c3 and proof 
     - [x] verify 
 - [x] commitment js 
-- [ ] smart contract 
-- [ ] goto the next step: POC Demo 
+- [x] smart contract 
+- [x] goto the next step: POC Demo 
 
 POC DEMO 
 We assume only three node, P, R, C. 

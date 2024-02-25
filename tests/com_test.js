@@ -28,7 +28,7 @@ describe("cipher functions", function () {
         const wallet = new ethers.Wallet(private_key);
         const expectedSignerAddress = wallet.address;
         // verify the signature
-        const isVerified = await comLib.COM_Ver("{" + h_prev + ", " + h_next + ", " + h_k + ", " + index + "}", signature, expectedSignerAddress);
+        const isVerified = await comLib.COM_Ver( h_prev, h_next, h_k, index, signature, expectedSignerAddress);
         chai.assert.equal(isVerified, true, "the signature should be verified");
         
     }); 

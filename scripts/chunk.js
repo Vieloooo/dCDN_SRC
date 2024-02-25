@@ -11,8 +11,8 @@ function getChunkFolder(inputFilePath) {
 }
 
 // Function to divide a file into chunks
-function divideIntoChunks(inputFilePath) {
-    const chunkFolder = getChunkFolder(inputFilePath);
+function divideIntoChunks(inputFilePath, chunkFolder) {
+    //const chunkFolder = getChunkFolder(inputFilePath);
     const data = fs.readFileSync(inputFilePath);
     const chunks = [];
     let i = 0;
@@ -111,8 +111,8 @@ function bigNumberArrayToChunk(bigNumbers) {
 }
 
 // Function to convert an input file into arrays of big numbers
-function inputFileToBigNumberArrays(inputFilePath) {
-    const chunkFolder = getChunkFolder(inputFilePath);
+function inputFileToBigNumberArrays(inputFilePath, chunkFolder) {
+    //const chunkFolder = getChunkFolder(inputFilePath);
     const chunkFilePaths = divideIntoChunks(inputFilePath, chunkFolder);
 
     // convert each chunk to big number array
