@@ -1,24 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0
-/*
-    Copyright 2021 0KIMS association.
-
-    This file is generated with [snarkJS](https://github.com/iden3/snarkjs).
-
-    snarkJS is a free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    snarkJS is distributed in the hope that it will be useful, but WITHOUT
-    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public
-    License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with snarkJS. If not, see <https://www.gnu.org/licenses/>.
-*/
-
 pragma solidity >=0.7.0 <0.9.0;
+
+struct ZKParam{
+    uint[2] _pA;
+    uint[2][2] _pB;
+    uint[2] _pC;
+}
 
 contract Groth16Verifier {
     // Scalar field size
@@ -64,8 +51,10 @@ contract Groth16Verifier {
     uint16 constant pPairing = 128;
 
     uint16 constant pLastMem = 896;
-
-    function verifyProof(uint[2] calldata _pA, uint[2][2] calldata _pB, uint[2] calldata _pC, uint[4] calldata _pubSignals) public view returns (bool) {
+    function verifyProof(ZKParam calldata _pp , uint[4] calldata _pubSignals) external view returns (bool) {
+        uint[2] calldata  _pA = _pp._pA;
+        uint[2][2] calldata _pB = _pp._pB;
+        uint[2]  calldata _pC = _pp._pC;
         assembly {
             function checkField(v) {
                 if iszero(lt(v, q)) {
@@ -189,9 +178,3 @@ contract Groth16Verifier {
          }
      }
  }
-
- /*
-    depoly gas 508357
-    proof gas: 209130 check cost: https://www.cryptoneur.xyz/en/gas-fees-calculator?gas-input=209130&gas-price-option=on for the real time usd cost 
-
- */

@@ -114,6 +114,7 @@ async function DELIVERY_encrypt_chunk(chunk, sk, eth_sk_path, index){
         sig: sig,
 
     }
+    //console.log(com, typeof(com["h_in"]));
     return {ctc, com }; 
 }
 

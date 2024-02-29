@@ -1,4 +1,8 @@
 const ethers = require('ethers');
+const { Web3, eth } = require('web3');
+// Specify the provider as needed, for example, an Ethereum node URL
+const web3 = new Web3('http://localhost:8545');
+const ethUtil = require('ethereumjs-util');
 
 /// generate a private key and write it to a file
 function generatePrivateKey(pk_path) {
@@ -12,22 +16,6 @@ function generatePrivateKey(pk_path) {
     //return wallet.privateKey;
     return wallet.address;
 }
-/// sign a message in string format
-async function signMessage(message, sk_path="eth_sk.txt") {
-    // 获取将签名的消息的哈希
-    const messageHash = ethers.utils.id(message);
-    // load pk and get wallet 
-    const fs = require('fs');
-    let private_key = fs.readFileSync(sk_path);
-    private_key = private_key.toString();
-    console.log(private_key, typeof(private_key));
-    const wallet = new ethers.Wallet(private_key);
-    // 签名消息哈希
-    const signature = await wallet.signMessage(ethers.utils.arrayify(messageHash));
-    console.log("Message:", message);
-    console.log("Signature:", signature);
-    return signature;
-}
 
 /// sign a message in string format, and return the calldata for solidity verification 
 async function signMessage_sol(message, sk_path="eth_sk.txt") {
@@ -37,16 +25,14 @@ async function signMessage_sol(message, sk_path="eth_sk.txt") {
     const fs = require('fs');
     let private_key = fs.readFileSync(sk_path);
     private_key = private_key.toString();
-    console.log(private_key, typeof(private_key));
-    const wallet = new ethers.Wallet(private_key);
-    // 签名消息哈希
-    const signature = await wallet.signMessage(ethers.utils.arrayify(messageHash));
-    console.log("Message:", message);
-    console.log("Signature:", signature);
+    const account = web3.eth.accounts.privateKeyToAccount(private_key);
+    let msg_array = Buffer.alloc(32, messageHash.slice(2), 'hex');
+    let pk_array = Buffer.alloc(32, account.privateKey.slice(2), 'hex');
+    let sig = ethUtil.ecsign(msg_array, pk_array);
     // split signature
-    const r = signature.slice(0, 66);
-    const s = "0x" + signature.slice(66, 130);
-    const v = parseInt(signature.slice(130, 132), 16);
+    const r = '0x' + sig.r.toString('hex');
+    const s = '0x' + sig.s.toString('hex');
+    const v = sig.v;
     return {r, s, v};
 }
 
@@ -68,15 +54,16 @@ async function COM_Ver( h_pre, h_nxt, h_k, index, signature, expectedSignerAddre
     // 假设 message 是一个字符串，signature 是由签名者生成的签名
     // 计算消息的以太坊特定签名哈希 (EIP-191)
     const messageHash = ethers.utils.id(message);
-    const messageHashBytes = ethers.utils.arrayify(messageHash);
-    // combine r, s, v to a full signature 
-    signature = signature.r + signature.s.slice(2) + signature.v.toString(16);
-    console.log("sig after", signature);
-    // 通过签名恢复出签名者的地址
-    const recoveredSignerAddress = ethers.utils.verifyMessage(messageHashBytes, signature);
-    
+    // get msghash buffer
+    let msg_array = Buffer.alloc(32, messageHash.slice(2), 'hex');
+    // recover 
+    const recv_pub = ethUtil.ecrecover(msg_array, signature.v, Buffer.from(signature.r.slice(2), 'hex'), Buffer.from(signature.s.slice(2), 'hex'));
+    // get the addr 
+    const addrBuf = ethUtil.pubToAddress(recv_pub);
+    const recv_pub_hex = '0x' + addrBuf.toString('hex');
+    console.log("rev signer: ", recv_pub_hex, expectedSignerAddress);
     // 比较恢复出的地址和预期的签名者地址
-    const isVerified = recoveredSignerAddress.toLowerCase() === expectedSignerAddress.toLowerCase();
+    const isVerified = recv_pub_hex.toLowerCase() === expectedSignerAddress.toLowerCase();
     return isVerified;
 }
 
