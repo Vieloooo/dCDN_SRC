@@ -7,7 +7,7 @@ const root_path = "./root.json"
 const DELILib = require("../phase_interface/delivery.js");
 const fs = require("fs");
 async function run(){
-    /*
+    
     console.log("P generate the hash of each chunk");
     await DELILib.DELIVERY_prep(file_path, hash_path, pt_folder, root_path);
 
@@ -22,12 +22,12 @@ async function run(){
     console.log("----------------------------------");
     
     console.log("P encrypt all plaintext chunks and generate encryption commitment");
-    const sk_path = "./P/sk.json";
-    const com_folder = "./P/com";
-    const eth_sk_path = "./P/eth_sk.txt";
-    await DELILib.DELIVERY_encrypt(pt_folder, sk_path, ct1_folder, com_folder, eth_sk_path);
-    */
-   /*
+    const sk_path_P = "./P/sk.json";
+    const com_folder_P = "./P/com";
+    const eth_sk_path_P = "./P/eth_sk.txt";
+    await DELILib.DELIVERY_encrypt(pt_folder, sk_path_P, ct1_folder, com_folder_P, eth_sk_path_P);
+    
+    
     console.log("P send the encrypted chunks to R");
     console.log("R verify the encrypted chunks and the encryption commitment");
     // get file numbers in folder 
@@ -62,15 +62,14 @@ async function run(){
             return;
         }
     }
+    
     console.log("R verify the encrypted chunks and the encryption commitment: ", true);
-    */
     console.log("--------------------------");
-    console.log("C get chunks encrypt by R and generate encryption commitment");
     const sk_path = "./R/sk.json";
     const com_folder = "./R/com";
     const eth_sk_path = "./R/eth_sk.txt";
     await DELILib.DELIVERY_encrypt(ct1_folder, sk_path, ct2_folder, com_folder, eth_sk_path);
-    
+    console.log("C get chunks encrypt by R and generate encryption commitment");
 }
 
 run().then(()=> {process.exit(0);}).catch((e)=>{console.log(e); process.exit(1);}); 

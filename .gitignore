@@ -24,3 +24,10 @@ demo/P
 demo/R 
 demo/C 
 demo/PT 
+
+# bench 
+bench/*/*.json
+bench/*/*_js 
+!bench/*/input.json 
+bench/*/*.wtns 
+bench/*/*.sym 
