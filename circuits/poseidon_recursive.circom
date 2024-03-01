@@ -62,3 +62,69 @@ template hash64(){
     out <== l1.out[0];
 }
 
+
+//a merkle layer with M^N leaves, a layer of N M-to-1 hash functions
+// M < 15 
+// This circuit take M^n number as input, then it will take these numbers to N groups, each group has M numbers, then it will hash these M numbers to 1 number.
+template LayerMN(M, N){
+    var total_gate = M ** (N-1); 
+    signal input in[total_gate * M];
+    signal output out[total_gate]; 
+    component poseidon[total_gate]; 
+    for (var i = 0; i < total_gate; i++){
+        poseidon[i] = Poseidon(M);
+    }
+    for(var i = 0; i < total_gate; i++){
+        for(var j = 0; j < M; j++){
+            poseidon[i].inputs[j] <== in[M*i+j];
+        }
+        
+        out[i] <== poseidon[i].out;
+    }
+}
+
+template hash128(){
+    signal input in[128]; 
+    signal output out;
+    component h64 = hash64();
+    component l1 = LayerMN(2, 7);
+    // wire all input to l1 
+    for(var i = 0; i < 128; i++){
+        l1.in[i] <== in[i];
+    }
+    // wire l1 to h64
+    for(var i = 0; i < 64; i++){
+        h64.in[i] <== l1.out[i];
+    }
+    out <== h64.out;
+}
+
+template hash256(){
+    signal input in[256]; 
+    signal output out;
+    component h64 = hash64();
+    component l1 = LayerMN(4, 4);
+    // wire all input to l1
+    for(var i = 0; i < 256; i++){
+        l1.in[i] <== in[i];
+    }
+    // wire l1 to h128
+    for(var i = 0; i < 64; i++){
+        h64.in[i] <== l1.out[i];
+    }
+}
+
+template hash1024(){
+    signal input in[1024]; 
+    signal output out;
+    component h256 = hash256();
+    component l1 = LayerMN(4, 5);
+    // wire all input to l1
+    for(var i = 0; i < 1024; i++){
+        l1.in[i] <== in[i];
+    }
+    // wire l1 to h512 
+    for(var i = 0; i < 256; i++){
+        h256.in[i] <== l1.out[i];
+    }
+}

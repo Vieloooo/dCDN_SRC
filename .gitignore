@@ -31,3 +31,9 @@ bench/*/*_js
 !bench/*/input.json 
 bench/*/*.wtns 
 bench/*/*.sym 
+!/bench/pof/*/out 
+!/bench/pof/test_*/eva.sh 
+bench/pof/test*/*.json 
+bench/pof/test*/test_pof_js 
+bench/pof/test*/*.sym 
+bench/pof/test*/*.wtns

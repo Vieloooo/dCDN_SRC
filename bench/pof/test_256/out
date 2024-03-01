@@ -1,0 +1,68 @@
+========== Step1: compile circom  ==========
+~/atom_store/dcdn_src/bench/pof/test_256 ~/atom_store/dcdn_src/bench/pof/test_256
+circom test_pof.circom --r1cs --sym --wasm
+[32mtemplate instances[0m: 303
+non-linear constraints: 118121
+linear constraints: 0
+public inputs: 1
+public outputs: 3
+private inputs: 260
+private outputs: 0
+wires: 118385
+labels: 589888
+[32mWritten successfully:[0m ./test_pof.r1cs
+[32mWritten successfully:[0m ./test_pof.sym
+[32mWritten successfully:[0m ./test_pof_js/test_pof.wasm
+[32mEverything went okay, circom safe[0m
+~/atom_store/dcdn_src/bench/pof/test_256
+========== Step2: setup ==========
+~/atom_store/dcdn_src/bench/pof/test_256 ~/atom_store/dcdn_src/bench/pof/test_256
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading r1cs
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading tauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading tauG2
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading alphatauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading betatauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Circuit hash: 
+		5a68f2ea e786808e e321c04f 4e67c38a
+		26352ab9 76260b0f 07c36966 02cfe002
+		6274c019 4d24ec77 5ad91533 981bd126
+		2d682416 5096c99d 3bd554ef a19c3fa6
+Enter a random text. (Entropy): [36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 0/118380
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 65536/118380
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 0/131072
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 65536/131072
+[32;22m[INFO]  [39;1msnarkJS[0m: Circuit Hash: 
+		5a68f2ea e786808e e321c04f 4e67c38a
+		26352ab9 76260b0f 07c36966 02cfe002
+		6274c019 4d24ec77 5ad91533 981bd126
+		2d682416 5096c99d 3bd554ef a19c3fa6
+[32;22m[INFO]  [39;1msnarkJS[0m: Contribution Hash: 
+		34c01409 d4d6b119 ec3ce5e3 a0d7107d
+		0e31832c f30b1188 54d332ee 60177ea2
+		e230c8cb 1bef04b4 804315aa 119d06de
+		5d783963 a2a03e43 92530ac4 2a40e87b
+[32;22m[INFO]  [39;1msnarkJS[0m: EXPORT VERIFICATION KEY STARTED
+[32;22m[INFO]  [39;1msnarkJS[0m: > Detected protocol: groth16
+[32;22m[INFO]  [39;1msnarkJS[0m: EXPORT VERIFICATION KEY FINISHED
+Prove key size: 95M
+Verify key size: 3.4K
+~/atom_store/dcdn_src/bench/pof/test_256
+========== Step3: generate witness  ==========
+~/atom_store/dcdn_src/bench/pof/test_256 ~/atom_store/dcdn_src/bench/pof/test_256
+node test_pof_js/generate_witness.js test_pof_js/test_pof.wasm input.json witness.wtns
+~/atom_store/dcdn_src/bench/pof/test_256
+========== Step4: prove  ==========
+~/atom_store/dcdn_src/bench/pof/test_256 ~/atom_store/dcdn_src/bench/pof/test_256
+snarkjs groth16 prove tk1.zkey witness.wtns proof.json public.json
+mem 1487380.000000
+time 9.003333
+cpu 606.666667
+Proof size: 803
+~/atom_store/dcdn_src/bench/pof/test_256
+========== Step5: verify  ==========
+~/atom_store/dcdn_src/bench/pof/test_256 ~/atom_store/dcdn_src/bench/pof/test_256
+snarkjs groth16 verify verification_key.json public.json proof.json
+mem 178022.666667
+time 0.610000
+cpu 269.666667
+~/atom_store/dcdn_src/bench/pof/test_256

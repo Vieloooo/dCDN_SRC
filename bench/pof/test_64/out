@@ -1,0 +1,66 @@
+========== Step1: compile circom  ==========
+~/atom_store/dcdn_src/bench/pof/test_64 ~/atom_store/dcdn_src/bench/pof/test_64
+circom test_pof.circom --r1cs --sym --wasm
+[32mtemplate instances[0m: 229
+non-linear constraints: 26633
+linear constraints: 0
+public inputs: 1
+public outputs: 3
+private inputs: 68
+private outputs: 0
+wires: 26703
+labels: 142562
+[32mWritten successfully:[0m ./test_pof.r1cs
+[32mWritten successfully:[0m ./test_pof.sym
+[32mWritten successfully:[0m ./test_pof_js/test_pof.wasm
+[32mEverything went okay, circom safe[0m
+~/atom_store/dcdn_src/bench/pof/test_64
+========== Step2: setup ==========
+~/atom_store/dcdn_src/bench/pof/test_64 ~/atom_store/dcdn_src/bench/pof/test_64
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading r1cs
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading tauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading tauG2
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading alphatauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading betatauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Circuit hash: 
+		c4cc436f 278ffac9 3b6dc4cf a3fd4310
+		5aa07ab3 9f0c89b5 1aaa575f a806b3ae
+		6d5b68d4 5309e110 e484c9c4 9966a767
+		bc74a8b3 1f0048cd f5c8a019 7ac10763
+Enter a random text. (Entropy): [36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 0/26698
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 0/32768
+[32;22m[INFO]  [39;1msnarkJS[0m: Circuit Hash: 
+		c4cc436f 278ffac9 3b6dc4cf a3fd4310
+		5aa07ab3 9f0c89b5 1aaa575f a806b3ae
+		6d5b68d4 5309e110 e484c9c4 9966a767
+		bc74a8b3 1f0048cd f5c8a019 7ac10763
+[32;22m[INFO]  [39;1msnarkJS[0m: Contribution Hash: 
+		a78f3998 fd79493c af133880 752a6da7
+		735bc0d4 92afc433 53009699 40c7065d
+		cfe42903 2d7f50d4 0c19a416 632b333c
+		08049d0c c0c517fb 5798f952 51345585
+[32;22m[INFO]  [39;1msnarkJS[0m: EXPORT VERIFICATION KEY STARTED
+[32;22m[INFO]  [39;1msnarkJS[0m: > Detected protocol: groth16
+[32;22m[INFO]  [39;1msnarkJS[0m: EXPORT VERIFICATION KEY FINISHED
+Prove key size: 19M
+Verify key size: 3.4K
+~/atom_store/dcdn_src/bench/pof/test_64
+========== Step3: generate witness  ==========
+~/atom_store/dcdn_src/bench/pof/test_64 ~/atom_store/dcdn_src/bench/pof/test_64
+node test_pof_js/generate_witness.js test_pof_js/test_pof.wasm input.json witness.wtns
+~/atom_store/dcdn_src/bench/pof/test_64
+========== Step4: prove  ==========
+~/atom_store/dcdn_src/bench/pof/test_64 ~/atom_store/dcdn_src/bench/pof/test_64
+snarkjs groth16 prove tk1.zkey witness.wtns proof.json public.json
+mem 675688.000000
+time 2.443333
+cpu 578.333333
+Proof size: 804
+~/atom_store/dcdn_src/bench/pof/test_64
+========== Step5: verify  ==========
+~/atom_store/dcdn_src/bench/pof/test_64 ~/atom_store/dcdn_src/bench/pof/test_64
+snarkjs groth16 verify verification_key.json public.json proof.json
+mem 177309.333333
+time 0.560000
+cpu 275.666667
+~/atom_store/dcdn_src/bench/pof/test_64
