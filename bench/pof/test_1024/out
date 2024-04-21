@@ -1,0 +1,64 @@
+========== Step1: compile circom  ==========
+========== Step2: setup ==========
+~/atom_store/dcdn_src/bench/pof/test_1024 ~/atom_store/dcdn_src/bench/pof/test_1024
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading r1cs
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading tauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading tauG2
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading alphatauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Reading betatauG1
+[32;22m[INFO]  [39;1msnarkJS[0m: Circuit hash: 
+		91750d25 d6041e80 3fe60d75 21c3adb4
+		c3a3c7f3 73e3e240 fd56908f 7b07129c
+		c3b98809 442ee557 473ca1ca 3e6e4263
+		6ae945f0 c95e9657 d0162557 d4739cee
+Enter a random text. (Entropy): [36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 0/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 65536/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 131072/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 196608/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 262144/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 327680/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 393216/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: L Section: 458752/485100
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 0/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 65536/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 131072/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 196608/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 262144/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 327680/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 393216/524288
+[36;22m[DEBUG] [39;1msnarkJS[0m: Applying key: H Section: 458752/524288
+[32;22m[INFO]  [39;1msnarkJS[0m: Circuit Hash: 
+		91750d25 d6041e80 3fe60d75 21c3adb4
+		c3a3c7f3 73e3e240 fd56908f 7b07129c
+		c3b98809 442ee557 473ca1ca 3e6e4263
+		6ae945f0 c95e9657 d0162557 d4739cee
+[32;22m[INFO]  [39;1msnarkJS[0m: Contribution Hash: 
+		6baa3011 d78dea09 f5b97224 e7f59dcc
+		ca32bb23 7455ebfb 392edf80 f903f5b5
+		9cbb2c5e 603a2c2a 51716695 7b4d85fe
+		987894ed 9b91c786 01640c8a 42c7bc33
+[32;22m[INFO]  [39;1msnarkJS[0m: EXPORT VERIFICATION KEY STARTED
+[32;22m[INFO]  [39;1msnarkJS[0m: > Detected protocol: groth16
+[32;22m[INFO]  [39;1msnarkJS[0m: EXPORT VERIFICATION KEY FINISHED
+Prove key size: 397M
+Verify key size: 3.4K
+~/atom_store/dcdn_src/bench/pof/test_1024
+========== Step3: generate witness  ==========
+~/atom_store/dcdn_src/bench/pof/test_1024 ~/atom_store/dcdn_src/bench/pof/test_1024
+node test_pof_js/generate_witness.js test_pof_js/test_pof.wasm input.json witness.wtns
+~/atom_store/dcdn_src/bench/pof/test_1024
+========== Step4: prove  ==========
+~/atom_store/dcdn_src/bench/pof/test_1024 ~/atom_store/dcdn_src/bench/pof/test_1024
+snarkjs groth16 prove tk1.zkey witness.wtns proof.json public.json
+mem 4612430.666667
+time 34.260000
+cpu 597.000000
+Proof size: 807
+~/atom_store/dcdn_src/bench/pof/test_1024
+========== Step5: verify  ==========
+~/atom_store/dcdn_src/bench/pof/test_1024 ~/atom_store/dcdn_src/bench/pof/test_1024
+snarkjs groth16 verify verification_key.json public.json proof.json
+mem 178746.666667
+time 0.516667
+cpu 307.666667
+~/atom_store/dcdn_src/bench/pof/test_1024

@@ -62,7 +62,6 @@ Proof size: 805
 ========== Step5: verify  ==========
 ~/atom_store/dcdn_src/bench/pof/test_128 ~/atom_store/dcdn_src/bench/pof/test_128
 snarkjs groth16 verify verification_key.json public.json proof.json
-mem 177234.666667
-time 0.583333
-cpu 272.333333
-~/atom_store/dcdn_src/bench/pof/test_128
+mem 178714.666667
+time 0.553333
+cpu 311.000000

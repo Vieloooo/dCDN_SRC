@@ -34,7 +34,7 @@ function setup() {
 function generateWtns() {
     pushd "$SCRIPT_DIR"
     echo node test_pof_js/generate_witness.js test_pof_js/test_pof.wasm input.json witness.wtns
-    "${TIME[@]}" node test_pof_js/generate_witness.js test_pof_js/test_pof.wasm input.json witness.wtns
+    avg_time 1 node test_pof_js/generate_witness.js test_pof_js/test_pof.wasm input.json witness.wtns
     popd
 }
 
@@ -77,16 +77,16 @@ function verify() {
 }
 
 echo "========== Step1: compile circom  =========="
-compile
+#compile
 
 echo "========== Step2: setup =========="
-setup
+#setup
 
 echo "========== Step3: generate witness  =========="
 generateWtns
 
 echo "========== Step4: prove  =========="
-normalProve
+#normalProve
 
 echo "========== Step5: verify  =========="
-verify
+#verify

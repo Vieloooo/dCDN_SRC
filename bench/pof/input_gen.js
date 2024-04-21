@@ -23,3 +23,5 @@ GenInputN(64, "./test_64");
 GenInputN(128, "./test_128");
 GenInputN(256, "./test_256");
 GenInputN(512, "./test_512");
+GenInputN(1024, "./test_1024");
+GenInputN(2048, "./test_2048");
