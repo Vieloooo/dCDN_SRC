@@ -128,3 +128,26 @@ template hash1024(){
         h256.in[i] <== l1.out[i];
     }
 }
+
+template hash2048(){
+    signal input in[2048]; 
+    signal output out;
+    component h1 = hash512();
+    component h2 = hash512();
+    component h3 = hash512();
+    component h4 = hash512();
+    // write input to 4 h 
+    for (var i = 0 ; i< 512; i++){
+        h1.in[i] <== in[i];
+        h2.in[i] <== in[i+512];
+        h3.in[i] <== in[i+1024];
+        h4.in[i] <== in[i+1536];
+    }
+    component h4to1 = Poseidon(4);
+    h4to1.inputs[0] <== h1.out;
+    h4to1.inputs[1] <== h2.out;
+    h4to1.inputs[2] <== h3.out;
+    h4to1.inputs[3] <== h4.out;
+    out <== h4to1.out;
+    
+}

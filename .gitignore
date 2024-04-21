@@ -37,3 +37,4 @@ bench/pof/test*/*.json
 bench/pof/test*/test_pof_js 
 bench/pof/test*/*.sym 
 bench/pof/test*/*.wtns
+

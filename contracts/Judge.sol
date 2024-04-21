@@ -74,7 +74,7 @@ contract MinimumJudge {
         payable(msg.sender).transfer(amount);
     }
     // _pubSignals[0] is the hash of secret key h(MK0, MK1, nonce); _pubSignals[1] is the hash of the ciphertext chunk h(ct), _pubSignals[2] is the hash of the plaintext chunk h(pt), _pubSignals[3] is the index of the chunk. all number are in hex format 
-    function proofOfFraud(ZKParam calldata _pp, uint[4] calldata _pubSignals, string memory originPTHash,  uint8 _v, bytes32 _r, bytes32 _s, address cheater_addr) external {
+    function pome(ZKParam calldata _pp, uint[4] calldata _pubSignals, string memory originPTHash,  uint8 _v, bytes32 _r, bytes32 _s, address cheater_addr) external {
         // check if the cheater_addr has enough deposit
         require(users[cheater_addr].balance >= x, "Not part of the network");
 
@@ -102,11 +102,33 @@ contract MinimumJudge {
 
     }
 
+    
+    function pomm(bytes32 _hs, bytes32 _hk, bytes32 _xor, bytes32 _secret, uint8 _v, bytes32 _r, bytes32 _s, address _addr) public {
+        string memory message = string(abi.encodePacked("{", _hs, _hk, _xor,"}"));
+        bytes32 msgHash = keccak256(abi.encodePacked(message)); 
+        // check the signer
+        address signer = ecrecover(msgHash, _v, _r, _s);
+        require(signer == _addr, "Invalid signature");
+        // check h(s) and h(k)
+        bytes32 hs = keccak256(abi.encodePacked(_secret));
+        require(_hs == hs, "secret and hash don't match");
+        // compute k
+        bytes32 k = _secret ^ _xor;
+        bytes32 hk = keccak256(abi.encodePacked(k));
+        // slash the node
+        if (hk != _hk) {
+            uint256 amount = users[_addr].balance;
+            users[_addr].balance = 0;
+            uint256 reward = amount * z / 10000;
+            payable(msg.sender).transfer(reward);
+        } 
+    }
+
     function verifySignature(string memory _originalMessage, uint8 _v, bytes32 _r, bytes32 _s, address _expectedSigner) public returns (bool) {
             bytes32 msgHash = keccak256(abi.encodePacked(_originalMessage)); 
             address signer = ecrecover(msgHash, _v, _r, _s);
             return signer == _expectedSigner;
-        }
+    }
 }
 /*
     // remix VM: (Shanghai)
