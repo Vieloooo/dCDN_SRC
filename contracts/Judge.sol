@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0
 pragma solidity ^0.8.0;
 
+//import "./PoF.sol"; 
 import "@openzeppelin/contracts/utils/Strings.sol";
 
 struct ZKParam{
@@ -23,6 +24,29 @@ contract MinimumJudge {
         uint256 balance;
         uint256 leaveBlockHeight;
     }
+    struct Sig{
+        uint8 _v; 
+        bytes32 _r;
+        bytes32 _s;
+    }
+    // Enforceable A-HTLC 
+    struct Challenge {
+        uint256 T; // Block height (timestamp)
+        bytes32[] H; // Ordered list of hashes
+        bytes32 h0; // A single hash
+        address[] ADDR; // List of addresses
+    }
+
+    struct Ch2 {
+        uint256 st; // start time 
+        bytes32[] H; // Ordered list of hashes
+        address[] ADDR; // List of addresses
+        uint256 idx;    // the one to be challenged start from n -> 1 
+    }
+
+    // Challenge list 
+    mapping(bytes32 => Ch2) public challengeList; 
+    uint256 public constant inverval = 2; 
     // zkp addr 
     address public zkpAddr; 
     // Minimum deposit to join network
@@ -57,7 +81,7 @@ contract MinimumJudge {
         require(msg.value >= x, "Insufficient Ether sent");
         // the new user must have not join the network before 
         require(users[msg.sender].balance == 0, "Already part of the network");
-        users[msg.sender].balance += msg.value;
+        users[msg.sender].balance = msg.value;
         users[msg.sender].leaveBlockHeight = 0;
     }
 
@@ -76,7 +100,7 @@ contract MinimumJudge {
     // _pubSignals[0] is the hash of secret key h(MK0, MK1, nonce); _pubSignals[1] is the hash of the ciphertext chunk h(ct), _pubSignals[2] is the hash of the plaintext chunk h(pt), _pubSignals[3] is the index of the chunk. all number are in hex format 
     function pome(ZKParam calldata _pp, uint[4] calldata _pubSignals, string memory originPTHash,  uint8 _v, bytes32 _r, bytes32 _s, address cheater_addr) external {
         // check if the cheater_addr has enough deposit
-        require(users[cheater_addr].balance >= x, "Not part of the network");
+        //require(users[cheater_addr].balance >= x, "Not part of the network");
 
         // check the origin originPTHash != _pubSignals[2]
         // convert the _pubSignals[2] to string first 
@@ -101,9 +125,7 @@ contract MinimumJudge {
         payable(msg.sender).transfer(reward);
 
     }
-
-    
-    function pomm(bytes32 _hs, bytes32 _hk, bytes32 _xor, bytes32 _secret, uint8 _v, bytes32 _r, bytes32 _s, address _addr) public {
+    function pomm(bytes32 _hs, bytes32 _hk, bytes32 _xor, bytes32 _secret, uint8 _v, bytes32 _r, bytes32 _s, address _addr) external {
         string memory message = string(abi.encodePacked("{", _hs, _hk, _xor,"}"));
         bytes32 msgHash = keccak256(abi.encodePacked(message)); 
         // check the signer
@@ -125,9 +147,72 @@ contract MinimumJudge {
     }
 
     function verifySignature(string memory _originalMessage, uint8 _v, bytes32 _r, bytes32 _s, address _expectedSigner) public returns (bool) {
-            bytes32 msgHash = keccak256(abi.encodePacked(_originalMessage)); 
+            bytes memory prefix = "\x19Ethereum Signed Message:\n32"; 
+            bytes32 msgHash = keccak256(abi.encodePacked( _originalMessage)); 
+            bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, msgHash));
+            address signer = ecrecover(prefixedHash, _v, _r, _s);
+            return signer == _expectedSigner;
+    }
+
+    function verifyRawSignature(bytes32 msgHash, uint8 _v, bytes32 _r, bytes32 _s, address _expectedSigner) public returns (bool) {
+            bytes memory prefix = "\x19Ethereum Signed Message:\n32"; 
+            bytes32 prefixedHash = keccak256(abi.encodePacked(prefix, msgHash));
             address signer = ecrecover(msgHash, _v, _r, _s);
             return signer == _expectedSigner;
+    }
+    function HashCh(Challenge memory Ch) public pure returns(bytes32) {
+        bytes32 h1 = keccak256(abi.encodePacked(Ch.T)); 
+        bytes32 h2 = keccak256(abi.encodePacked(h1,Ch.h0 )); 
+        bytes32 h3 = keccak256(abi.encodePacked(h2, Ch.H));
+        bytes32 h4 = keccak256(abi.encodePacked(h3, Ch.ADDR));
+        return h4; 
+    }
+    function EnfStart( Challenge calldata Ch, Sig[] calldata sigs, bytes calldata s0) external {
+        // Ch has never been uploaded before 
+        // cal the hash of Ch 
+        bytes32 ct = HashCh(Ch); 
+        // check if ct in challenge lists 
+        require(challengeList[ct].st == 0, "Already challenged");
+        require(block.number <= Ch.T, "Challenge Timeout");
+        bytes32 h02 = keccak256(abi.encodePacked(s0));
+        require(h02 == Ch.h0, "invalid sync secret"); 
+        // check if sig in sigs sign ch 
+        // length of sigs 
+        uint256 sig_len = sigs.length ;
+        require(Ch.ADDR.length == sig_len, "invalid signatures"); 
+        for (uint256 i=0 ; i < sig_len; i++){
+            require(verifyRawSignature(ct, sigs[i]._v, sigs[i]._r,sigs[i]._s, Ch.ADDR[i]) , "Invalid signatures"); 
+        }
+        // set idx
+        challengeList[ct].idx = sig_len - 1;
+        challengeList[ct].H = Ch.H; 
+        challengeList[ct].st = block.number ;
+        challengeList[ct].ADDR = Ch.ADDR ;
+    }
+
+    function EnfLog(bytes32 ct2, bytes calldata si) external {
+        bytes32 hi = challengeList[ct2].H[challengeList[ct2].idx - 1]; 
+        // check timeout : challengeList[ct2].st + (addr.length - idx) * interval > current block height 
+        uint256 id =  challengeList[ct2].idx - 1; 
+        require(id > 0, "Invalid index");
+        require(challengeList[ct2].st + (challengeList[ct2].ADDR.length - id + 1) * inverval > block.number ,"Invalid responce" );
+        // check revealed secrets 
+        require(hi == keccak256(abi.encodePacked(si)),"Invalid secrets");
+        challengeList[ct2].idx = id; 
+    }
+    function EnfPunish(bytes32 ct2) external {
+        // require idx != 0 
+        require(challengeList[ct2].idx != 0, "Not Challenged");
+        // challengeList[ct2].st + (addr.length - idx) * interval < current block height 
+        require(challengeList[ct2].st + (challengeList[ct2].ADDR.length - challengeList[ct2].idx - 1) * inverval < block.number ,"Invalid challenge" );
+        address cheater_addr = challengeList[ct2].ADDR[challengeList[ct2].idx];
+        // slash the deposit and transfer the z percent to the submitter
+        uint256 amount = users[cheater_addr].balance;
+        users[cheater_addr].balance = 0;
+        uint256 reward = amount * z / 10000;
+        address refunder = challengeList[ct2].ADDR[0]; 
+        payable(refunder).transfer(reward);
+        challengeList[ct2].idx = 0; 
     }
 }
 /*
